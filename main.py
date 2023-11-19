@@ -68,12 +68,12 @@ d = {
     # "Player who returned":[
     #   "https://ranobes.com/chapters/player-who-returned-10000-years-later/50777-prolog.html",521
     # ],
-    "Outside Of Time": [
-        "https://ranobes.com/ranobe/354130-outside-of-time.html", 1482
-    ],
-    # "Renegade Immortal":[
-    #     "https://ranobes.com/chapters/renegade-immortal/215074-glossarij.html",2092,
-    # ]
+    # "Outside Of Time": [
+    #     "https://ranobes.com/ranobe/354130-outside-of-time.html", 1482
+    # ],
+    "Renegade Immortal":[
+        "https://ranobes.com/ranobe/799-renegade-immortal.html",2092,
+    ]
     # "Against the Gods":[
     #     "https://ranobes.com/chapters/against-the-gods/100834-nprolog.html",2036,
     # ]
@@ -102,8 +102,7 @@ def get_data(n):
                 renderer="Intel Iris OpenGL Engine",
                 fix_hairline=True,
                 )
-        if not (n in os.listdir(path=".")):
-            os.mkdir(n)
+
         # обход анти-бота
         Anti(driver, URL)
         # description
@@ -119,19 +118,56 @@ def get_data(n):
         WebDriverWait(driver, 5).until(
             EC.presence_of_element_located((By.XPATH, '//*[@id="fs-chapters"]/div/div[3]/a[1]'))
         ).click()
-
-        for i in range(1, count + 1):
-            li: list[str] = OneG(driver)
-            with open(f"{n}\\{i}.txt", "w", encoding='utf-8') as f:
-                f.writelines('\n'.join(li))
-            x = '//*[@id="next"]'
-            if i == count:
-                URL = driver.current_url
-                print(URL)
-            else:
+        if not (n in os.listdir(path=".")):
+            os.mkdir(n)
+        else:
+            try:
+                 file = open(f"{n}\\URL_END.txt", "r")
+            except IOError as e:
+                print(u'не удалось открыть файл')
+                file = open(f"{n}\\URL_END.txt", "w")
+                x = '//*[@id="next"]'
                 driver.find_element(By.XPATH, x).click()
-                URL = driver.current_url
-                print(URL)
+                for i in range(1, count + 1):
+                    li: list[str] = OneG(driver)
+                    with open(f"{n}\\{i}.txt", "w", encoding='utf-8') as f:
+                        f.writelines('\n'.join(li))
+                    if i == count:
+                        URL = driver.current_url
+                        print(URL)
+                        print(count, URL, file=file)
+                    else:
+                        driver.find_element(By.XPATH, x).click()
+                        URL = driver.current_url
+                        print(URL)
+            else:
+                with file:
+                    print(u'делаем что-то с файлом')
+                    content = file.read()
+            meta=content.split(" ")
+
+            save_count=int(meta[0])
+            if count>save_count:
+                driver.get(meta[1])
+                x = '//*[@id="next"]'
+                driver.find_element(By.XPATH, x).click()
+                for i in range(save_count+1, count + 1):
+                    li: list[str] = OneG(driver)
+                    with open(f"{n}\\{i}.txt", "w", encoding='utf-8') as f:
+                        f.writelines('\n'.join(li))
+
+                    if i == count:
+                        URL = driver.current_url
+                        print(URL)
+                        with open(f"{n}\\URL_END.txt", "w", encoding='utf-8') as f1:
+                            print(count, URL, file=f1)
+                    else:
+                        driver.find_element(By.XPATH, x).click()
+                        URL = driver.current_url
+                        print(URL)
+            else:
+                print("актуал")
+
     except Exception as ex:
         print(ex)
     finally:
