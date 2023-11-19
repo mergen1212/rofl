@@ -15,7 +15,7 @@ from selenium_stealth import stealth
 
 def OneG(driver) -> list[str]:
     li: list[str] = []
-    element=WebDriverWait(driver, 5).until(
+    element = WebDriverWait(driver, 5).until(
         EC.presence_of_all_elements_located((By.XPATH, '//*[@id="arrticle"]'))
     )
     for div in element:
@@ -44,13 +44,15 @@ def src_url(driver) -> str:
         "src")
     return elem
 
-def get_count_change(driver)->int:
+
+def get_count_change(driver) -> int:
     chapters_count = WebDriverWait(driver, 5).until(
         EC.presence_of_element_located((By.XPATH, '//*[@id="fs-info"]/div[2]/ul[1]/li[4]/span/span'))).text
     if chapters_count.isdigit():
         return (int(chapters_count))
     else:
         return 0
+
 
 # opts.add_argument("window-size=1400,600")
 
@@ -118,15 +120,18 @@ def get_data(n):
             EC.presence_of_element_located((By.XPATH, '//*[@id="fs-chapters"]/div/div[3]/a[1]'))
         ).click()
 
-        for i in range(1, count ):
+        for i in range(1, count + 1):
             li: list[str] = OneG(driver)
             with open(f"{n}\\{i}.txt", "w", encoding='utf-8') as f:
                 f.writelines('\n'.join(li))
             x = '//*[@id="next"]'
-
-            elo = driver.find_element(By.XPATH, x).click()
-            URL = driver.current_url
-            print(URL)
+            if i == count:
+                URL = driver.current_url
+                print(URL)
+            else:
+                driver.find_element(By.XPATH, x).click()
+                URL = driver.current_url
+                print(URL)
     except Exception as ex:
         print(ex)
     finally:
