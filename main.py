@@ -127,6 +127,7 @@ def get_data(n):
                 print(u'не удалось открыть файл')
                 file = open(f"{n}\\URL_END.txt", "w")
                 x = '//*[@id="next"]'
+                ######
                 driver.find_element(By.XPATH, x).click()
                 for i in range(1, count + 1):
                     li: list[str] = OneG(driver)
